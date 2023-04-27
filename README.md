@@ -84,6 +84,4 @@ Use the token to check if the authentification was successful by using:
 `DELETE /api/user/games/favorites?game_id={id}`
 
 ### Rate Limiting
-All routes that are not authenticated have a 5 hits per minute rate limiter middleware. To change that, edit the `$perMinute` variable in `App\Http\Middleware\SearchGameRequestLimiter` and `App\Http\Middleware\RetrieveGameDetailsRequestLimiter`.#� �g�a�m�e�-�a�p�i�
-�
-�
+All routes that are not authenticated have a 5 hits per minute rate limiter middleware. To change that, edit the `$perMinute` variable in `App\Http\Middleware\SearchGameRequestLimiter` and `App\Http\Middleware\RetrieveGameDetailsRequestLimiter`.
