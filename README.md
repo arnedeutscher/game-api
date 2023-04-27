@@ -44,7 +44,7 @@ Please provide a link to a GitHub or Gitlab repository containing your Laravel p
 2. `composer install`
 3. `composer update`
 4. `npm install`
-5. Create an `.env` file and add the following configurations:
+5. Rename the `.env.example` file to `.env` and add the following configurations:
 	- `DB_CONNECTION=sqlite`
 	- `DB_DATABASE="C:\\absolute\\path\\to\\game-api\\database\\database.sqlite"`
 	- `RAWG_API_KEY=YOUR-RAWG-API-KEY`
