@@ -51,6 +51,7 @@ Please provide a link to a GitHub or Gitlab repository containing your Laravel p
 6. Create the file `database.sqlite` in the project-folder `database`
 7. Migrate the database and seed with `php artisan migrate --seed` 
 8. Create passport client for testing by using `php artisan passport:client --personal` and choose `0` when asking `[0] users`
+9. Start the webserver with `php artisan serve` and use the webserver url to get access to the api.
 
 ### Authentification
 It is recommended to use a software like [Postman](https://www.postman.com/) to make api requests.
