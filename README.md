@@ -71,19 +71,19 @@ Use the token to check if the authentification was successful by using:
 ### How to use API
 
 - Simply get game from RAWG API and cache the result *(works without authentication).* 
-`GET /api/games/search?q={query}`
+<br/>`GET /api/games/search?q={query}`
 
 - Get games by id and save it to database. Use also database entry if exist to save api calls *(works without authentication).*
-`GET /api/games/{id}`
+<br/>`GET /api/games/{id}`
 
 - Get favorite games from **authenticated** user.
-`GET /api/user/games/favorites`
+<br/>`GET /api/user/games/favorites`
 
 - Add favorite game to **authenticated** user
-`POST /api/user/games/favorites?game_id={id}`
+<br/>`POST /api/user/games/favorites?game_id={id}`
 
 - Remove favorite game from **authenticated** user
-`DELETE /api/user/games/favorites?game_id={id}`
+<br/>`DELETE /api/user/games/favorites?game_id={id}`
 
 ### Rate Limiting
 All routes that are not authenticated have a 5 hits per minute rate limiter middleware. To change that, edit the `$perMinute` variable in `App\Http\Middleware\SearchGameRequestLimiter` and `App\Http\Middleware\RetrieveGameDetailsRequestLimiter`.
