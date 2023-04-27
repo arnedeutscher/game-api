@@ -23,7 +23,8 @@ Your task is to create a REST API using Laravel that aggregates game data from a
     3. GET /api/favorites: Retrieve a list of favorite games for the authenticated user as JSON (optional).
     4. POST /api/favorites: Add a game to the authenticated user's list of favorite games (optional).
     5. DELETE /api/favorites/{game_id}: Remove a game from the authenticated user's list of favorite games (optional).
-8. Cache the results of game searches and game details to reduce the number of calls to the external API.
+8. Run `php artisan passport:keys` to deploying passport.
+9. Cache the results of game searches and game details to reduce the number of calls to the external API.
 
 ### Bonus:
 
