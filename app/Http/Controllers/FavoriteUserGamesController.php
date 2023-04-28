@@ -41,7 +41,7 @@ class FavoriteUserGamesController extends Controller
 		if ($favorites == null) { return response()->json(['error' => true, 'message' => 'User has no entry.', 'favorites' => null], 404); } // error check
 
 		$game_ids = $favorites['game_ids'];
-		$game_ids = json_decode($game_ids, true); // "true" makes at an array
+		$game_ids = json_decode($game_ids, true); // "true" makes it an array
 
 		$favorites_db = Game::whereIn('external_id', $game_ids)->get(); // take a look on the database first before making api requests
 		$array_of_favorite_games = $favorites_db->toArray(); // collection to array for better handling the next steps
@@ -67,7 +67,7 @@ class FavoriteUserGamesController extends Controller
 					$game_detail['background_image'],
 				);
 
-				$game_detail['from_db'] = false;
+				//$game_detail['from_db'] = false; // only to dev-check if entry from db or not
 				$array_of_favorite_games[] = $game_detail->toArray(); // add to main array
 			}
 		}
@@ -101,7 +101,7 @@ class FavoriteUserGamesController extends Controller
 
 			// update
 			$game_ids = $favorites['game_ids'];
-			$game_ids = json_decode($game_ids, true); // "true" makes at an array
+			$game_ids = json_decode($game_ids, true); // "true" makes it an array
 			if ($game_ids == null) { $game_ids = []; }; // Make shure, $game_ids is an array (can happen when the database column is manually deleted).
 
 			// already in the database?

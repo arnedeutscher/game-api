@@ -43,7 +43,7 @@ class GameController extends Controller
     public function search(SearchGameRequest $request): JsonResponse
 	{
 		// check if id already exists in cache (work for later: put this into an seperate request)
-		$cache = Cache::get($request['q']);
+		$cache = Cache::get($request['q']); // query
 		if ($cache != null) {
 			return response()->json([
 				'error' => false,
@@ -58,8 +58,8 @@ class GameController extends Controller
 		Cache::put($request['q'], $games->json(), now()->addMinutes(10)); // add response to cache for the next 10 minutes
 
 		return response()->json([
-			'error' => false, 'message' => 
-			'Games were loaded via api.', 
+			'error' => false,
+			'message' => 'Games were loaded via api.', 
 			'games' => $games->json()
 		], 200);
 	}
