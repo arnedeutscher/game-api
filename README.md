@@ -74,7 +74,7 @@ Use the token to check if the authentification was successful by using:
 - Simply get game from RAWG API and cache the result *(works without authentication).* 
 <br/>`GET /api/games/search?q={query}`
 
-- Get games by id and save it to database. Use also database entry if exist to save api calls *(works without authentication).*
+- Get game details by id and save it to database. Use also database entry if exist to save api calls *(works without authentication).*
 <br/>`GET /api/games/{id}`
 
 - Get favorite games from **authenticated** user.
