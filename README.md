@@ -32,7 +32,7 @@ Your task is to create a REST API using Laravel that aggregates game data from a
 2. Ensure that only authenticated users can add or remove games from their list of favorite games.
 3. Implement rate limiting for the API to prevent excessive usage.
 4. Add the ability to filter game searches by release date, platform, or genre.
-5. ~~Implement a recommendation system that suggests games based on the authenticated user's list of favorite games.~~
+5. Implement a recommendation system that suggests games based on the authenticated user's list of favorite games.
 
 ### Submission:
 
@@ -91,6 +91,12 @@ Use the token to check if the authentification was successful by using:
 
 - Remove favorite game from **authenticated** user
 <br/>`DELETE /api/user/games/favorites?game_id={id}`
+
+- Rate favorite game from **authenticated** user from 0 to 10
+<br/>`PATCH /api/user/games/favorites/rate?game_id={id}&rating={0-10}`
+
+- Remove rating of favorite game from **authenticated** user (set to default)
+<br/>`PATCH /api/user/games/favorites/rate/remove?game_id={id}`
 
 ### Rate Limiting
 All routes that are not authenticated have a 5 hits per minute rate limiter middleware. To change that, edit the `$perMinute` variable in `App\Http\Middleware\SearchGameRequestLimiter` and `App\Http\Middleware\RetrieveGameDetailsRequestLimiter`.
