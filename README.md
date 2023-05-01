@@ -31,7 +31,7 @@ Your task is to create a REST API using Laravel that aggregates game data from a
 1. Implement basic user authentication using Laravel's built-in authentication system, such as Laravel Passport, to secure the API.
 2. Ensure that only authenticated users can add or remove games from their list of favorite games.
 3. Implement rate limiting for the API to prevent excessive usage.
-4. ~~Add the ability to filter game searches by release date, platform, or genre.~~
+4. Add the ability to filter game searches by release date, platform, or genre.
 5. ~~Implement a recommendation system that suggests games based on the authenticated user's list of favorite games.~~
 
 ### Submission:
@@ -76,6 +76,12 @@ Use the token to check if the authentification was successful by using:
 
 - Get game details by id and save it to database. Use also database entry if exist to save api calls *(works without authentication).*
 <br/>`GET /api/games/{id}`
+
+- Get games by (multiple) filter
+<br/>`GET /api/user/games/filter?{filter}={value}`
+	- filter: release_date, value: date format YYYY-MM-DD
+	- filter: platform, value: numeric
+	- filter: genre, value: numeric
 
 - Get favorite games from **authenticated** user.
 <br/>`GET /api/user/games/favorites`

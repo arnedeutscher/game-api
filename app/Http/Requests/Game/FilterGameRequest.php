@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 
-class SearchGameRequest extends FormRequest
+class FilterGameRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,9 @@ class SearchGameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'q' 			=> ['required', 'string'],
+            'release_date' => 	['nullable', 'date'], // format: 2010-01-01
+			'platform' => 		['nullable', 'numeric'],
+			'genre' => 			['nullable', 'numeric'],
         ];
     }
 

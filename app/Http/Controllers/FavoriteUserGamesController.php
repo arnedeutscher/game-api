@@ -87,6 +87,13 @@ class FavoriteUserGamesController extends Controller
 		$user_id = Auth::guard('api')->user()->id;
 		$game_id = $request['game_id'];
 
+		// check if game exist
+		$game_exist = $this->gameController->getGameById( $game_id );
+		$game_exist = $game_exist->json();
+		$game_exist = $game_exist['results'];
+		if ($game_exist == []) { return response()->json(['error' => true, 'message' => 'Game with id ' . $game_id . ' not found.'], 404); }
+
+		// get favorite games of user
 		$favorites = FavoriteUserGames::where('user_id', '=', $user_id)->first();
 
 		if ($favorites == null) {
@@ -101,7 +108,7 @@ class FavoriteUserGamesController extends Controller
 
 			// update
 			$game_ids = $favorites['game_ids'];
-			$game_ids = json_decode($game_ids, true); // "true" makes it an array
+			$game_ids = json_decode($game_ids, true); // "true" makes it to an array
 			if ($game_ids == null) { $game_ids = []; }; // Make shure, $game_ids is an array (can happen when the database column is manually deleted).
 
 			// already in the database?
@@ -134,7 +141,7 @@ class FavoriteUserGamesController extends Controller
 		// get game ids
 		$game_ids = $favorites['game_ids'];
 		
-		$game_ids = json_decode($game_ids, true); // "true" makes at an array
+		$game_ids = json_decode($game_ids, true); // "true" makes it to an array
 		if ($game_ids == null) { $game_ids = []; }; // Make shure, $game_ids is an array (can happen when the database column is manually deleted).
 
 		// get key of entry

@@ -3,6 +3,9 @@
 namespace App\Http\Requests\FavoriteUserGames;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 
 use Auth;
 
@@ -26,5 +29,22 @@ class DestroyFavoriteUserGameRequest extends FormRequest
         return [
             'game_id' => ['required', 'numeric'],
         ];
+    }
+
+	/**
+     * Returns validations as a json object.
+	 * 
+	 * @param Illuminate\Contracts\Validation\Validator
+     *
+     * @return Illuminate\Http\JsonResponse
+     */
+	protected function failedValidation(Validator $validator): JsonResponse
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'error' => true,
+                'message' => $validator->errors(),
+            ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY)
+        );
     }
 }
