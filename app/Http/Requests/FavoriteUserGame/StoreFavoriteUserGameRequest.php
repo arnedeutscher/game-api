@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\FavoriteUserGames;
+namespace App\Http\Requests\FavoriteUserGame;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 
 use Auth;
 
-class DestroyFavoriteUserGameRequest extends FormRequest
+class StoreFavoriteUserGameRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

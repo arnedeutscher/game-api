@@ -40,7 +40,7 @@ class UserController extends Controller
         $user = Auth::guard('api')->user();
 
 		if (!Auth::guard('api')->check()) {
-			return response()->json(['message' => 'Unauthorized.'], 401);
+			return response()->json(['error' => true, 'message' => 'Unauthorized.'], 401);
 		}
 		
 		return response()->json(['user' => $user], 200);

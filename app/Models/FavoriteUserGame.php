@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FavoriteUserGames extends Model
+class FavoriteUserGame extends Model
 {
     use HasFactory;
 
@@ -16,9 +16,15 @@ class FavoriteUserGames extends Model
      */
     protected $fillable = [
 		'user_id',
-		'game_ids',
-		'summary',
-		'release_date',
-		'cover_url',
+		'game_id',
+		'rating',
     ];
+
+	/**
+     * Get the game associated with the favorite game id.
+     */
+    public function game()
+    {
+        return $this->hasOne(Game::class, 'game_id', 'game_id');
+    }
 }

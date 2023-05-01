@@ -11,7 +11,7 @@ Your task is to create a REST API using Laravel that aggregates game data from a
 1. Set up a new Laravel project using Laravel 8 or above.
 2. Use a SQLite database for this project.
 3. Register for an API key from an open game database API, such as RAWG (https://rawg.io/apidocs) or IGDB (https://api.igdb.com/).
-4. Create a Game model with the following attributes: id, external_id, title, summary, release_date, and cover_url.
+4. Create a Game model with the following attributes: id, game_id, title, summary, release_date, and cover_url.
 5. Create a migration for the Game model and run the migration to create the games table in the database.
 6. Create a GameController that handles the following operations:
     1. Search for games using the external API based on a query string.
@@ -19,7 +19,7 @@ Your task is to create a REST API using Laravel that aggregates game data from a
     3. Manage a list of favorite games for authenticated users (optional).
 7. Create the following API routes for managing games:
     1. GET /api/games/search?q={query}: Search for games using the external API based on a query string and return the results as JSON.
-    2. GET /api/games/{external_id}: Retrieve game details from the external API based on the external_id, store them in the local database, and return the game details as JSON.
+    2. GET /api/games/{game_id}: Retrieve game details from the external API based on the game_id, store them in the local database, and return the game details as JSON.
     3. GET /api/favorites: Retrieve a list of favorite games for the authenticated user as JSON (optional).
     4. POST /api/favorites: Add a game to the authenticated user's list of favorite games (optional).
     5. DELETE /api/favorites/{game_id}: Remove a game from the authenticated user's list of favorite games (optional).

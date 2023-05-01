@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('games', function (Blueprint $table) {
             $table->id();
-			$table->unsignedBigInteger('external_id');
+			$table->unsignedBigInteger('game_id');
 			$table->string('title');
 			$table->text('summary');
 			$table->date('release_date');

@@ -6,11 +6,11 @@ use App\Http\Controllers\GameController;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-use App\Models\FavoriteUserGames;
 use App\Models\Game;
+use App\Models\FavoriteUserGame;
 
-use App\Http\Requests\FavoriteUserGames\StoreFavoriteUserGameRequest;
-use App\Http\Requests\FavoriteUserGames\DestroyFavoriteUserGameRequest;
+use App\Http\Requests\FavoriteUserGame\StoreFavoriteUserGameRequest;
+use App\Http\Requests\FavoriteUserGame\DestroyFavoriteUserGameRequest;
 
 use Auth;
 
@@ -33,52 +33,46 @@ class FavoriteUserGamesController extends Controller
 	 */
 	public function get(): JsonResponse
 	{
-		if (!Auth::guard('api')->check()) { return response()->json(['message' => 'Unauthorized.'], 401); }
+		if (!Auth::guard('api')->check()) { return response()->json(['error' => true, 'message' => 'Unauthorized.'], 401); }
 
 		$user_id = Auth::guard('api')->user()->id;
-		$favorites = FavoriteUserGames::where('user_id', '=', $user_id)->first();
+		$favorites = FavoriteUserGame::where('user_id', '=', $user_id)->get();
 
-		if ($favorites == null) { return response()->json(['error' => true, 'message' => 'User has no entry.', 'favorites' => null], 404); } // error check
+		if ($favorites->isEmpty()) { return response()->json(['error' => true, 'message' => 'User has no favorite games.', 'favorites' => null], 404); } // error check
 
-		$game_ids = $favorites['game_ids'];
-		$game_ids = json_decode($game_ids, true); // "true" makes it an array
+		// eager load game details of each favorite game
+		$favorites = $favorites->load('game'); 
+		$favorites = $favorites->toArray(); // make it editable in foreach loop
 
-		$favorites_db = Game::whereIn('external_id', $game_ids)->get(); // take a look on the database first before making api requests
-		$array_of_favorite_games = $favorites_db->toArray(); // collection to array for better handling the next steps
+		// if an game not found in the database with eager loading, add it from api to database and add game-details to this response
+		foreach ($favorites as $key => $favorite) {
+			if ($favorite['game'] === null) {
 
-		foreach($game_ids as $game_id) {
+				$game_details = $this->gameController->getGameDetailsById($favorite['game_id']);
 
-			// Check if game_id already exist in database array
-			foreach($array_of_favorite_games as $fav) {
-				if ($game_id == $fav['external_id']) { continue 2; } // it exist, no api request necessary, so continue both iterations
-			}
+				if ($game_details->status() != 200) { abort(404, 'Game not found on api.'); } // should not be possible, because on store function we checked this
 
-			$game_detail = $this->gameController->getGameDetailsById( $game_id );
-			
-			// existing?
-			if ($game_detail->status() == 200) {
+				$game_details = $game_details->json();
 
-				// store into database for the next query, to save api requests
-				$game_detail = $this->gameController->storeGameDetailsInDatabase(
-					$game_detail['id'],
-					$game_detail['name'],
-					$game_detail['description'],
-					$game_detail['released'],
-					$game_detail['background_image'],
+				$game = $this->gameController->storeGameDetailsInDatabase(
+					$game_details['id'],
+					$game_details['name'],
+					$game_details['description'],
+					$game_details['released'],
+					$game_details['background_image'],
 				);
 
-				//$game_detail['from_db'] = false; // only to dev-check if entry from db or not
-				$array_of_favorite_games[] = $game_detail->toArray(); // add to main array
+				$favorites[$key]['game'] = $game;
 			}
 		}
 
-		return response()->json(['error' => 'false', 'message' => 'Success.', 'games' => $array_of_favorite_games], 200);
+		return response()->json(['error' => 'false', 'message' => 'Success.', 'games' => $favorites], 200);
 	}
 
 	/**
 	 * Add games to users favorite games.
 	 * 
-	 * @param App\Http\Requests\FavoriteUserGames\StoreFavoriteUserGameRequest
+	 * @param App\Http\Requests\FavoriteUserGame\StoreFavoriteUserGameRequest
 	 * 
 	 * @return \Illuminate\Http\JsonResponse
 	 */
@@ -87,37 +81,25 @@ class FavoriteUserGamesController extends Controller
 		$user_id = Auth::guard('api')->user()->id;
 		$game_id = $request['game_id'];
 
-		// check if game exist
+		// get favorite game of user
+		$favorite = FavoriteUserGame::where('user_id', '=', $user_id)->where('game_id', '=', $game_id)->first();
+
+		// check if game exist on database
+		if ($favorite) { return response()->json(['error' => true, 'message' => 'Game with id ' . $game_id . ' already exist in the databse.'], 404); }
+
+		// get game from api
 		$game_exist = $this->gameController->getGameById( $game_id );
 		$game_exist = $game_exist->json();
 		$game_exist = $game_exist['results'];
+
+		// check if game exist in api
 		if ($game_exist == []) { return response()->json(['error' => true, 'message' => 'Game with id ' . $game_id . ' not found.'], 404); }
 
-		// get favorite games of user
-		$favorites = FavoriteUserGames::where('user_id', '=', $user_id)->first();
-
-		if ($favorites == null) {
-
-			// create new
-			$favorites = FavoriteUserGames::create([
-				'user_id' => $user_id,
-				'game_ids' => json_encode([$game_id]) // first id must be added to an array so more ids can be added later
-			]);
-
-		}else{
-
-			// update
-			$game_ids = $favorites['game_ids'];
-			$game_ids = json_decode($game_ids, true); // "true" makes it to an array
-			if ($game_ids == null) { $game_ids = []; }; // Make shure, $game_ids is an array (can happen when the database column is manually deleted).
-
-			// already in the database?
-			if (in_array($game_id, $game_ids)) { return response()->json(['error' => true, 'message' => 'Game with game_id ' . $game_id . ' already stored in the database.'], 400); }
-
-			$game_ids[] = $game_id;
-			$game_ids = json_encode($game_ids);
-			$favorites->update(['game_ids' => $game_ids]);
-		}
+		// create new
+		$favorites = FavoriteUserGame::create([
+			'user_id' => $user_id,
+			'game_id' => $game_id,
+		]);
 
 		return response()->json(['error' => false, 'message' => 'Game with game_id ' . $game_id . ' stored successful in the database.'], 200);
 	}
@@ -125,7 +107,7 @@ class FavoriteUserGamesController extends Controller
 	/**
 	 * Destroy game from users favorite games.
 	 * 
-	 * @param App\Http\Requests\FavoriteUserGames\DestroyFavoriteUserGameRequest
+	 * @param App\Http\Requests\FavoriteUserGame\DestroyFavoriteUserGameRequest
 	 * 
 	 * @return \Illuminate\Http\JsonResponse
 	 */
@@ -134,25 +116,11 @@ class FavoriteUserGamesController extends Controller
 		$user_id = Auth::guard('api')->user()->id;
 		$game_id = $request['game_id'];
 
-		$favorites = FavoriteUserGames::where('user_id', '=', $user_id)->first();
+		$favorite = FavoriteUserGame::where('user_id', '=', $user_id)->where('game_id', '=', $game_id)->first();
 
-		if ($favorites == null) { return response()->json(['error' => true, 'message' => 'User has no entry.', 'favorites' => null], 404); } // error check
+		if ($favorite == null) { return response()->json(['error' => true, 'message' => 'Favorite game with game_id ' . $game_id . ' not found in the database.'], 404); } // error check
 
-		// get game ids
-		$game_ids = $favorites['game_ids'];
-		
-		$game_ids = json_decode($game_ids, true); // "true" makes it to an array
-		if ($game_ids == null) { $game_ids = []; }; // Make shure, $game_ids is an array (can happen when the database column is manually deleted).
-
-		// get key of entry
-		$key = array_search($game_id, $game_ids);
-
-		// check if entry exist
-		if ($key === false) { return response()->json(['error' => true, 'message' => 'Game with game_id ' . $game_id . ' not found in the database.'], 404); }
-
-		unset($game_ids[$key]); // remove id from array
-		$game_ids = json_encode($game_ids);
-		$favorites->update(['game_ids' => $game_ids]);
+		$favorite->delete();
 
 		return response()->json(['error' => false, 'message' => 'Game with game_id ' . $game_id . ' successful removed from the database.'], 200);
 	}

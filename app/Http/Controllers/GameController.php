@@ -145,25 +145,25 @@ class GameController extends Controller
 	/**
 	 * Retrieve game details from the external API and store them in the local database.
 	 * 
-	 * @param String  $external_id
+	 * @param String  $game_id
 	 * 
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function retrieve_details(String $external_id): JsonResponse
+	public function retrieve_details(String $game_id): JsonResponse
 	{
-		if (!is_numeric($external_id)) { return response()->json(['error' => true, 'message' => 'Id must be numeric.'], 400); }
+		if (!is_numeric($game_id)) { return response()->json(['error' => true, 'message' => 'Id must be numeric.'], 400); }
 
 		// check if id already exists in cache
-		$cache = Cache::get('eID_' . $external_id);
+		$cache = Cache::get('eID_' . $game_id);
 		if ($cache != null) {
 			return response()->json([
 				'error' => false,
 				'message' => 'Games were loaded from the database.',
-				'data' => Game::where('external_id', '=', $external_id)->first(),
+				'data' => Game::where('game_id', '=', $game_id)->first(),
 			], 200);
 		} // return cached data
 
-		$game_details = $this->getGameDetailsById($external_id);
+		$game_details = $this->getGameDetailsById($game_id);
 
 		if ($game_details->status() != 200) { return response()->json(['error' => true, 'message' => $game_details->getReasonPhrase()], $game_details->status()); } // error check
 
@@ -177,7 +177,7 @@ class GameController extends Controller
 			$game_details['background_image'],
 		);
 
-		Cache::put('eID_' . $external_id, true, now()->addMinutes(10)); // add response to cache for the next 10 minutes
+		Cache::put('eID_' . $game_id, true, now()->addMinutes(10)); // add response to cache for the next 10 minutes
 
 		return response()->json([
 			'error' => false,
@@ -189,7 +189,7 @@ class GameController extends Controller
 	/**
 	 * Store game details into database.
 	 * 
-	 * @param String $external_id
+	 * @param String $game_id
 	 * @param String $title
 	 * @param String $summary
 	 * @param String $release_date
@@ -197,11 +197,11 @@ class GameController extends Controller
 	 * 
 	 * @return
 	 */
-	public function storeGameDetailsInDatabase(String $external_id, String $title, String $summary, String $release_date, String $cover_url)
+	public function storeGameDetailsInDatabase(String $game_id, String $title, String $summary, String $release_date, String $cover_url)
 	{
 		// only create entry if not exist
 		return Game::firstOrCreate([
-			'external_id' => $external_id,
+			'game_id' => $game_id,
 			'title' => $title,
 			'summary' => $summary,
 			'release_date' => $release_date,

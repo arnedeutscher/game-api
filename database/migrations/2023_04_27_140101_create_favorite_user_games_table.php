@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('favorite_user_games', function (Blueprint $table) {
             $table->id();
+			$table->unsignedBigInteger('game_id');
 			$table->unsignedBigInteger('user_id');
-			$table->json('game_ids');
+			$table->unsignedSmallInteger('rating')->nullable();
             $table->timestamps();
         });
     }

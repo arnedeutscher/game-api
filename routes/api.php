@@ -30,7 +30,7 @@ Route::controller(UserController::class)->group(function () {
 Route::controller(GameController::class)->group(function () {
     Route::get('/games/search', 'search')->middleware(SearchGameRequestLimiter::class);
 	Route::get('/games/filter', 'filter')->middleware(FilterGamesRequestLimiter::class);
-	Route::get('/games/{external_id}', 'retrieve_details')->middleware(RetrieveGameDetailsRequestLimiter::class);
+	Route::get('/games/{game_id}', 'retrieve_details')->middleware(RetrieveGameDetailsRequestLimiter::class);
 });
 
 Route::controller(FavoriteUserGamesController::class)->group(function () {
